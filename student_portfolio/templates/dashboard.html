@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block title %}Edit portfolio &middot; PortfolioHub{% endblock %}
+{% block content %}
+<div class="container py-4 dash" id="dash" data-student-id="{{ target_id }}">
+  {% if editing_other %}
+  <div class="alert alert-info">You are editing this student's portfolio as an admin. <a href="{{ url_for('pages.admin') }}">Back to admin</a></div>
+  {% endif %}
+
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-3">
+    <div>
+      <h1 class="h2 mb-1">{% if editing_other %}Edit portfolio{% else %}My portfolio{% endif %}</h1>
+      <p class="text-muted mb-0">Changes are saved when you press <strong>Save changes</strong>.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <a id="view-link" class="btn btn-outline-dark btn-sm" href="/p/{{ target_id }}"><i class="bi bi-eye"></i> View</a>
+      <button id="copy-link" class="btn btn-outline-dark btn-sm" type="button"><i class="bi bi-link-45deg"></i> Copy share link</button>
+    </div>
+  </div>
+
+  <div class="panel meter-panel">
+    <div class="d-flex justify-content-between mb-1"><strong>Profile strength</strong><span id="meter-text">0%</span></div>
+    <div class="progress" role="progressbar" aria-label="Profile strength"><div id="meter-bar" class="progress-bar" style="width:0%"></div></div>
+    <ul id="meter-tips" class="meter-tips"></ul>
+  </div>
+
+  <div id="error-box" class="alert alert-danger d-none" role="alert"></div>
+
+  <form id="portfolio-form" novalidate>
+    <section class="panel">
+      <h2>Basics</h2>
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div id="photo-box" class="photo-box"></div>
+          <div class="d-flex gap-2 mt-2">
+            <button id="photo-pick" class="btn btn-outline-dark btn-sm flex-fill" type="button">Change photo</button>
+            <button id="photo-remove" class="btn btn-outline-danger btn-sm d-none" type="button" aria-label="Remove photo"><i class="bi bi-trash"></i></button>
+          </div>
+          <input id="photo-input" type="file" accept="image/png,image/jpeg,image/webp" hidden>
+          <div class="form-text">JPG, PNG or WebP, up to 2 MB.</div>
+        </div>
+        <div class="col-md-9">
+          <div class="row g-3">
+            <div class="col-md-8">
+              <label class="form-label" for="f-name">Full name</label>
+              <input class="form-control" id="f-name" data-path="name" maxlength="80">
+              <div class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-usn">USN</label>
+              <input class="form-control" id="f-usn" data-path="usn" maxlength="20">
+              <div class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-8">
+              <label class="form-label" for="f-department">Department</label>
+              <select class="form-select" id="f-department" data-path="department">
+                {% for d in config.DEPARTMENTS %}<option>{{ d }}</option>{% endfor %}
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label" for="f-year">Year</label>
+              <select class="form-select" id="f-year" data-path="year">
+                {% for y in config.YEARS %}<option value="{{ y }}">Year {{ y }}</option>{% endfor %}
+              </select>
+              <div class="invalid-feedback"></div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="f-about">About you</label>
+              <textarea class="form-control" id="f-about" data-path="about" rows="4" maxlength="600" placeholder="Two or three sentences on what you build and what you are looking for."></textarea>
+              <div class="d-flex justify-content-between"><div class="invalid-feedback"></div><div class="form-text ms-auto"><span id="about-count">0</span>/600</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Skills</h2>
+      <div id="skills-box" class="chip-input" data-path="skills">
+        <span id="skills-chips"></span>
+        <input id="skill-input" type="text" maxlength="40" placeholder="Type a skill and press Enter" aria-label="Add a skill">
+      </div>
+      <div class="invalid-feedback d-block"></div>
+      <div class="form-text mb-2">Up to 30 skills.</div>
+      <div id="skill-suggest" class="chips"></div>
+    </section>
+
+    <section class="panel">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Projects</h2>
+        <button id="add-project" class="btn btn-outline-primary btn-sm" type="button"><i class="bi bi-plus-lg"></i> Add project</button>
+      </div>
+      <div id="projects"></div>
+    </section>
+
+    <section class="panel">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Certifications</h2>
+        <button id="add-cert" class="btn btn-outline-primary btn-sm" type="button"><i class="bi bi-plus-lg"></i> Add certification</button>
+      </div>
+      <div id="certs"></div>
+    </section>
+
+    <section class="panel">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <h2 class="mb-0">Achievements</h2>
+        <button id="add-ach" class="btn btn-outline-primary btn-sm" type="button"><i class="bi bi-plus-lg"></i> Add achievement</button>
+      </div>
+      <div id="achievements"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Links</h2>
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label" for="f-github">GitHub</label>
+          <input class="form-control" id="f-github" data-path="links.github" placeholder="github.com/username">
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="f-linkedin">LinkedIn</label>
+          <input class="form-control" id="f-linkedin" data-path="links.linkedin" placeholder="linkedin.com/in/username">
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="f-website">Website</label>
+          <input class="form-control" id="f-website" data-path="links.website" placeholder="yourname.dev">
+          <div class="invalid-feedback"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Visibility</h2>
+      <div class="form-check form-switch">
+        <input class="form-check-input" type="checkbox" role="switch" id="f-public">
+        <label class="form-check-label" for="f-public">Show my portfolio in the public gallery and allow anyone with the link to view it</label>
+      </div>
+      <div class="form-text">When this is off, only you and admins can open your portfolio.</div>
+    </section>
+
+    <div class="save-bar">
+      <span id="save-state" class="text-muted small">No changes yet</span>
+      <button id="save-btn" class="btn btn-primary" type="submit">Save changes</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>{% endblock %}

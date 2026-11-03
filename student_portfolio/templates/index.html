@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Student portfolios &middot; PortfolioHub{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1 class="hero-title">Find the student<br>behind the <mark>skills</mark>.</h1>
+    <p class="hero-sub">Browse projects, certifications and achievements from our students. Search by name, skill or department.</p>
+
+    <form class="finder" id="finder" role="search" autocomplete="off">
+      <div class="finder-main">
+        <i class="bi bi-search"></i>
+        <input id="q" class="form-control" type="search" placeholder="Try &quot;python&quot;, &quot;IoT&quot; or a student's name" aria-label="Search portfolios">
+      </div>
+      <select id="dept" class="form-select" aria-label="Department">
+        <option value="">All departments</option>
+        {% for d in config.DEPARTMENTS %}<option>{{ d }}</option>{% endfor %}
+      </select>
+      <select id="year" class="form-select" aria-label="Year of study">
+        <option value="">Any year</option>
+        {% for y in config.YEARS %}<option value="{{ y }}">Year {{ y }}</option>{% endfor %}
+      </select>
+    </form>
+    <div id="active-skill" class="mt-2"></div>
+  </div>
+</section>
+
+<section class="container pb-5">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <p class="mb-0 text-muted" id="count" aria-live="polite">Loading portfolios&hellip;</p>
+    <select id="sort" class="form-select form-select-sm w-auto" aria-label="Sort">
+      <option value="newest">Newest first</option>
+      <option value="name">Name A&ndash;Z</option>
+    </select>
+  </div>
+  <div id="grid" class="row g-4"></div>
+  <div id="pager" class="mt-4"></div>
+</section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/gallery.js') }}"></script>{% endblock %}

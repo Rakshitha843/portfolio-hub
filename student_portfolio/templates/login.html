@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Log in &middot; PortfolioHub{% endblock %}
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card">
+    <h1 class="h3 mb-1">Welcome back</h1>
+    <p class="text-muted mb-4">Log in to edit your portfolio, or to manage students as an admin.</p>
+    <form id="login-form" data-next="{{ next_url }}" novalidate>
+      <div class="mb-3">
+        <label class="form-label" for="email">Email</label>
+        <input class="form-control" id="email" name="email" type="email" autocomplete="username" required autofocus>
+      </div>
+      <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <div id="form-error" class="alert alert-danger py-2 d-none" role="alert"></div>
+      <button class="btn btn-primary w-100" type="submit">Log in</button>
+    </form>
+    <p class="text-center small mt-4 mb-0">New here? <a href="{{ url_for('pages.register') }}">Create your portfolio</a></p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}

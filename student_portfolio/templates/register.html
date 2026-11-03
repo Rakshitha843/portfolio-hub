@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Create your portfolio &middot; PortfolioHub{% endblock %}
+{% block content %}
+<div class="container auth-wrap">
+  <div class="auth-card auth-card-wide">
+    <h1 class="h3 mb-1">Create your portfolio</h1>
+    <p class="text-muted mb-4">Start with the basics. Your portfolio stays private until you choose to publish it.</p>
+    <form id="register-form" novalidate>
+      <div class="row g-3">
+        <div class="col-12">
+          <label class="form-label" for="name">Full name</label>
+          <input class="form-control" id="name" name="name" data-path="name" maxlength="80" autocomplete="name" required>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="usn">USN</label>
+          <input class="form-control" id="usn" name="usn" data-path="usn" maxlength="20" placeholder="1BI21CS014" required>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="email">College email</label>
+          <input class="form-control" id="email" name="email" data-path="email" type="email" autocomplete="username" required>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-8">
+          <label class="form-label" for="department">Department</label>
+          <select class="form-select" id="department" name="department" data-path="department" required>
+            <option value="">Choose&hellip;</option>
+            {% for d in config.DEPARTMENTS %}<option>{{ d }}</option>{% endfor %}
+          </select>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label" for="year">Year</label>
+          <select class="form-select" id="year" name="year" data-path="year" required>
+            <option value="">Choose&hellip;</option>
+            {% for y in config.YEARS %}<option value="{{ y }}">Year {{ y }}</option>{% endfor %}
+          </select>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-control" id="password" name="password" data-path="password" type="password" autocomplete="new-password" required>
+          <div class="form-text">At least 8 characters, with a letter and a number.</div>
+          <div class="invalid-feedback"></div>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label" for="confirm">Confirm password</label>
+          <input class="form-control" id="confirm" type="password" autocomplete="new-password" required>
+          <div class="invalid-feedback"></div>
+        </div>
+      </div>
+      <div id="form-error" class="alert alert-danger py-2 mt-3 d-none" role="alert"></div>
+      <button class="btn btn-primary w-100 mt-4" type="submit">Create portfolio</button>
+    </form>
+    <p class="text-center small mt-4 mb-0">Already registered? <a href="{{ url_for('pages.login') }}">Log in</a></p>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', filename='js/auth.js') }}"></script>{% endblock %}

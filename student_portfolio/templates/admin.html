@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block title %}Admin &middot; PortfolioHub{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-end gap-2 mb-3">
+    <div>
+      <h1 class="h2 mb-1">Student portfolios</h1>
+      <p class="text-muted mb-0">Search, review and manage every portfolio, public or private.</p>
+    </div>
+    <a class="btn btn-outline-dark btn-sm" href="/api/admin/export.csv"><i class="bi bi-filetype-csv"></i> Export CSV</a>
+  </div>
+
+  <div class="row g-3 mb-3" id="stat-cards">
+    <div class="col-6 col-lg-3"><div class="stat"><span class="stat-num" id="st-total">&ndash;</span><span>Students</span></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><span class="stat-num" id="st-public">&ndash;</span><span>Public portfolios</span></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><span class="stat-num" id="st-depts">&ndash;</span><span>Departments</span></div></div>
+    <div class="col-6 col-lg-3"><div class="stat"><span class="stat-num" id="st-projects">&ndash;</span><span>Projects listed</span></div></div>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-lg-5"><div class="panel h-100"><h2 class="h6">Students per department</h2><div class="chart-box"><canvas id="chart-dept"></canvas></div></div></div>
+    <div class="col-lg-4"><div class="panel h-100"><h2 class="h6">Most common skills</h2><div class="chart-box"><canvas id="chart-skills"></canvas></div></div></div>
+    <div class="col-lg-3"><div class="panel h-100"><h2 class="h6">Students per year</h2><div class="chart-box"><canvas id="chart-year"></canvas></div></div></div>
+  </div>
+
+  <div class="panel">
+    <form class="row g-2 mb-3" id="filters" autocomplete="off">
+      <div class="col-md-4"><input id="q" class="form-control" type="search" placeholder="Search name, skill, USN or email" aria-label="Search"></div>
+      <div class="col-6 col-md-2">
+        <select id="dept" class="form-select" aria-label="Department"><option value="">All departments</option>{% for d in config.DEPARTMENTS %}<option>{{ d }}</option>{% endfor %}</select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="year" class="form-select" aria-label="Year"><option value="">Any year</option>{% for y in config.YEARS %}<option value="{{ y }}">Year {{ y }}</option>{% endfor %}</select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="visibility" class="form-select" aria-label="Visibility"><option value="">Any visibility</option><option value="public">Public</option><option value="private">Private</option></select>
+      </div>
+      <div class="col-6 col-md-2">
+        <select id="sort" class="form-select" aria-label="Sort"><option value="newest">Newest first</option><option value="name">Name A&ndash;Z</option></select>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead><tr><th>Student</th><th>USN</th><th>Department</th><th class="text-center">Skills</th><th class="text-center">Projects</th><th>Public</th><th class="text-end">Actions</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <p id="empty" class="text-muted text-center py-4 mb-0 d-none">No students match these filters.</p>
+    <div class="d-flex justify-content-between align-items-center mt-3">
+      <span id="count" class="small text-muted"></span>
+      <div id="pager"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="delete-modal" tabindex="-1" aria-labelledby="delete-title" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header"><h2 class="modal-title h5" id="delete-title">Delete this student?</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></div>
+      <div class="modal-body">
+        <p class="mb-0"><strong id="delete-name"></strong>'s account and portfolio will be removed permanently. This cannot be undone.</p>
+      </div>
+      <div class="modal-footer"><button class="btn btn-outline-dark" data-bs-dismiss="modal" type="button">Cancel</button><button id="delete-confirm" class="btn btn-danger" type="button">Delete student</button></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}

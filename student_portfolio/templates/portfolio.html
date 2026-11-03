@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}{{ s.name }} &middot; PortfolioHub{% endblock %}
+{% block meta %}
+  {% if not s.is_public %}<meta name="robots" content="noindex">{% endif %}
+  <meta property="og:title" content="{{ s.name }} - {{ s.department }} portfolio">
+  <meta property="og:description" content="{{ (s.about or 'Student portfolio')|truncate(150) }}">
+{% endblock %}
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3 no-print">
+    <a href="{{ url_for('pages.index') }}" class="btn btn-link text-dark ps-0"><i class="bi bi-arrow-left"></i> All portfolios</a>
+    <div class="d-flex gap-2">
+      {% if can_edit %}<a class="btn btn-outline-dark btn-sm" href="{{ edit_url }}"><i class="bi bi-pencil"></i> Edit</a>{% endif %}
+      <button id="copy-link" class="btn btn-outline-dark btn-sm" type="button"><i class="bi bi-link-45deg"></i> Copy link</button>
+      <button id="pdf-btn" class="btn btn-primary btn-sm" type="button"><i class="bi bi-download"></i> Download PDF</button>
+    </div>
+  </div>
+
+  {% if not s.is_public %}
+  <div class="alert alert-warning no-print">This portfolio is private. Only its owner and admins can see it. Publish it from the dashboard to share the link.</div>
+  {% endif %}
+
+  <article class="sheet" id="portfolio-sheet" data-name="{{ s.name }}">
+    <header class="sheet-head">
+      {% if s.has_photo %}
+        <img class="avatar avatar-xl" src="{{ url_for('pages.photo', sid=s.id) }}?v={{ s.updated_at }}" alt="Photo of {{ s.name }}">
+      {% else %}
+        <span class="avatar avatar-xl" style="--h: {{ s.name|hue }}">{{ s.name|initials }}</span>
+      {% endif %}
+      <div class="sheet-id">
+        <h1>{{ s.name }}</h1>
+        <p class="sheet-meta">{{ s.department }}, year {{ s.year }}{% if can_edit %} &middot; {{ s.usn }}{% endif %}</p>
+        <p class="sheet-links">
+          {% if s.links.github %}<a href="{{ s.links.github }}" target="_blank" rel="noopener noreferrer"><i class="bi bi-github"></i> GitHub</a>{% endif %}
+          {% if s.links.linkedin %}<a href="{{ s.links.linkedin }}" target="_blank" rel="noopener noreferrer"><i class="bi bi-linkedin"></i> LinkedIn</a>{% endif %}
+          {% if s.links.website %}<a href="{{ s.links.website }}" target="_blank" rel="noopener noreferrer"><i class="bi bi-globe2"></i> Website</a>{% endif %}
+        </p>
+      </div>
+    </header>
+
+    <div class="row g-4 sheet-body">
+      <div class="col-md-4">
+        {% if s.skills %}
+        <section class="sheet-section">
+          <h2>Skills</h2>
+          <div class="chips">{% for k in s.skills %}<span class="chip">{{ k }}</span>{% endfor %}</div>
+        </section>
+        {% endif %}
+        {% if s.certifications %}
+        <section class="sheet-section">
+          <h2>Certifications</h2>
+          <ul class="plain-list">
+            {% for c in s.certifications %}
+            <li>
+              {% if c.link %}<a href="{{ c.link }}" target="_blank" rel="noopener noreferrer">{{ c.name }}</a>{% else %}<strong>{{ c.name }}</strong>{% endif %}
+              <span class="text-muted d-block small">{{ c.issuer }}{% if c.issuer and c.year %}, {% endif %}{{ c.year or '' }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </section>
+        {% endif %}
+      </div>
+      <div class="col-md-8">
+        {% if s.about %}
+        <section class="sheet-section">
+          <h2>About</h2>
+          <p class="prewrap">{{ s.about }}</p>
+        </section>
+        {% endif %}
+        {% if s.projects %}
+        <section class="sheet-section">
+          <h2>Projects</h2>
+          {% for p in s.projects %}
+          <div class="project">
+            <h3>{{ p.title }}</h3>
+            {% if p.tech %}<div class="chips mb-2">{% for t in p.tech %}<span class="chip chip-quiet">{{ t }}</span>{% endfor %}</div>{% endif %}
+            {% if p.description %}<p class="prewrap mb-1">{{ p.description }}</p>{% endif %}
+            {% if p.link %}<a class="small" href="{{ p.link }}" target="_blank" rel="noopener noreferrer">View project</a>{% endif %}
+          </div>
+          {% endfor %}
+        </section>
+        {% endif %}
+        {% if s.achievements %}
+        <section class="sheet-section">
+          <h2>Achievements</h2>
+          <ul class="plain-list">{% for a in s.achievements %}<li>{{ a }}</li>{% endfor %}</ul>
+        </section>
+        {% endif %}
+        {% if not (s.about or s.projects or s.achievements or s.skills) %}
+        <p class="text-muted">This portfolio is still being put together.</p>
+        {% endif %}
+      </div>
+    </div>
+    <footer class="sheet-foot">Updated {{ s.updated_at|datefmt }}</footer>
+  </article>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/portfolio.js') }}"></script>
+{% endblock %}

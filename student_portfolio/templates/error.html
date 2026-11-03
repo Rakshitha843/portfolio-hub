@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} &middot; PortfolioHub{% endblock %}
+{% block content %}
+<div class="container auth-wrap text-center">
+  <p class="error-code">{{ code }}</p>
+  <h1 class="h3">{{ title }}</h1>
+  <p class="text-muted mx-auto" style="max-width:32rem">{{ message }}</p>
+  <a class="btn btn-primary mt-2" href="{{ url_for('pages.index') }}">Back to the gallery</a>
+</div>
+{% endblock %}
